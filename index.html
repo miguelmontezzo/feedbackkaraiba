@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FEEDBACK KARAIBA</title>
+    <meta name="description" content="Formulário Feedback Karaiba." />
+    <meta name="author" content="Allia" />
+
+    <meta property="og:title" content="FEEDBACK KARAIBA" />
+    <meta property="og:description" content="Formulário Feedback Karaiba." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://i.ibb.co/jP6D8nGm/Karaiba-Vermelho-Oclo.png" />
+
+    <meta name="twitter:card" content="" />
+    <meta name="twitter:site" content="@karaibarestaurante" />
+    <meta name="twitter:image" content="https://i.ibb.co/jP6D8nGm/Karaiba-Vermelho-Oclo.png" />
+
+    <!-- PWA -->
+    <meta name="theme-color" content="#7a0f12" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/iconeappgerencial.png" />
+    
+    <!-- Disable service worker caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    
+    <!-- Polyfills para compatibilidade Node.js no browser -->
+    <script>
+      // Polyfills mais seguros para evitar conflitos com React
+      if (typeof window.global === 'undefined') {
+        window.global = window;
+      }
+      if (typeof window.module === 'undefined') {
+        window.module = { exports: {} };
+      }
+      if (typeof window.exports === 'undefined') {
+        window.exports = {};
+      }
+      if (typeof window.__dirname === 'undefined') {
+        window.__dirname = '/';
+      }
+      if (typeof window.__filename === 'undefined') {
+        window.__filename = '/index.html';
+      }
+      if (typeof window.require === 'undefined') {
+        window.require = function(id) {
+          console.warn('require() called for:', id, '- returning empty object');
+          return {};
+        };
+      }
+    </script>
+    
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

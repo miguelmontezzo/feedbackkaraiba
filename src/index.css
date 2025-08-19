@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 98%;
+    --foreground: 340 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 340 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 20% 15%;
+
+    /* Karaíba wine red theme */
+    --primary: 340 75% 25%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 340 15% 90%;
+    --secondary-foreground: 340 20% 15%;
+
+    --muted: 340 10% 95%;
+    --muted-foreground: 340 15% 45%;
+
+    --accent: 340 25% 85%;
+    --accent-foreground: 340 75% 25%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Kanban status colors */
+    --status-pending: 25 95% 53%;
+    --status-pending-foreground: 26 83% 14%;
+    
+    --status-confirmed: 142 76% 36%;
+    --status-confirmed-foreground: 0 0% 98%;
+    
+    --status-delivery: 217 91% 60%;
+    --status-delivery-foreground: 0 0% 98%;
+
+    --border: 340 15% 85%;
+    --input: 340 15% 85%;
+    --ring: 340 75% 25%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 340 20% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 340 20% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 340 20% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 340 75% 35%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 340 20% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 340 20% 15%;
+    --muted-foreground: 340 15% 65%;
+
+    --accent: 340 20% 20%;
+    --accent-foreground: 0 0% 95%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --status-pending: 25 95% 53%;
+    --status-pending-foreground: 26 83% 14%;
+    
+    --status-confirmed: 142 76% 36%;
+    --status-confirmed-foreground: 0 0% 98%;
+    
+    --status-delivery: 217 91% 60%;
+    --status-delivery-foreground: 0 0% 98%;
+
+    --border: 340 20% 20%;
+    --input: 340 20% 20%;
+    --ring: 340 75% 35%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Não reservar espaço nenhum para scrollbar */
+    overflow-y: auto;
+  }
+}
+
+/* Neutraliza padding/margin injectados por libs de scroll-lock em body/html */
+.react-remove-scroll-bar {
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+html, body {
+  --removed-body-scroll-bar-size: 0px !important;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Se a lib setar inline style no body, ainda assim zera o padding-right */
+body[style*="padding-right"], html[style*="padding-right"] {
+  padding-right: 0 !important;
+}
+
+/* Preferir overlay quando suportado para não ocupar largura da viewport */
+@supports (overflow: overlay) {
+  body { overflow-y: overlay; }
+}
+
+/* Evita que o wrapper do Radix popper force largura > viewport (causando pulo/scroll horizontal) */
+[data-radix-popper-content-wrapper] {
+  min-width: 0 !important;
+  max-width: 100vw !important;
+}
+[data-radix-popper-content-wrapper] > * {
+  max-width: calc(100vw - 16px) !important;
+}
+
+/* Container principal sem overflow horizontal */
+.container {
+  overflow-x: hidden;
+}
