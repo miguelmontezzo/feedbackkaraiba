@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabaseFeedback, type LogFeedback, FEEDBACK_SUPABASE_URL, FEEDBACK_SUPABASE_ANON_KEY } from "@/integrations/supabase/feedbackClient";
+import { CheckCircle2 } from "lucide-react";
 
 type RouteParams = {
   idFeedback?: string;
@@ -14,7 +15,6 @@ const MAX_LENGTH = 500;
 
 export default function FeedbackPage() {
   const { idFeedback, numeroPedido } = useParams<RouteParams>();
-  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,7 +51,6 @@ export default function FeedbackPage() {
         const { data, error } = await query.limit(1).maybeSingle();
         if (error) throw error;
         if (!ignore) setSheetRecord(data || null);
-        if (!data) navigate('/', { replace: true });
       } catch (e: any) {
         // Fallback direto via REST com headers, para contornar 401 em libs
         try {
@@ -66,7 +65,6 @@ export default function FeedbackPage() {
           const rows = await resp.json();
           const found = (rows && rows.length > 0) ? rows[0] : null;
           if (!ignore) setSheetRecord(found);
-          if (!found) navigate('/', { replace: true });
         } catch {
           if (!ignore) setError("Não foi possível carregar dados do feedback.");
         }
@@ -146,58 +144,60 @@ export default function FeedbackPage() {
             </p>
           </div>
 
-          <div className="space-y-4 bg-red-800/60 rounded-lg p-4 shadow-sm">
-          <div className="space-y-2">
-            <Label htmlFor="message" className="text-white">Como foi sua experiência?</Label>
-            <Textarea
-              id="message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value.slice(0, MAX_LENGTH))}
-              placeholder="Escreva aqui seu comentário (elogio, sugestão ou problema)..."
-              className="min-h-[140px] bg-white text-red-900 placeholder:text-red-500 focus-visible:ring-red-500"
-            />
-            <div className="flex justify-end text-xs text-red-100">
-              {message.length}/{MAX_LENGTH}
+          {success ? (
+            <div className="bg-white text-red-900 rounded-lg p-6 text-center shadow-sm">
+              <CheckCircle2 className="mx-auto h-16 w-16 text-green-600 mb-3" />
+              <h2 className="text-xl font-semibold">Feedback enviado!</h2>
+              <p className="mt-1">Obrigado! Karaíba Restaurante agradece!</p>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-white">Sua nota</Label>
-            <div className="flex items-center gap-3" role="radiogroup" aria-label="Escolha sua nota">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  aria-label={`Nota ${star}`}
-                  onClick={() => setRating(star)}
-                  className={
-                    "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-colors " +
-                    (rating && rating >= star
-                      ? "bg-red-500 text-white"
-                      : "bg-red-950/40 text-red-200 hover:bg-red-900")
-                  }
-                >
-                  {star}
-                </button>
-              ))}
+          ) : (
+            <div className="space-y-4 bg-red-800/60 rounded-lg p-4 shadow-sm">
+              <div className="space-y-2">
+                <Label htmlFor="message" className="text-white">Como foi sua experiência?</Label>
+                <Textarea
+                  id="message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value.slice(0, MAX_LENGTH))}
+                  placeholder="Escreva aqui seu comentário (elogio, sugestão ou problema)..."
+                  className="min-h-[140px] bg-white text-red-900 placeholder:text-red-500 focus-visible:ring-red-500"
+                />
+                <div className="flex justify-end text-xs text-red-100">
+                  {message.length}/{MAX_LENGTH}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-white">Sua nota</Label>
+                <div className="flex items-center gap-3" role="radiogroup" aria-label="Escolha sua nota">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      aria-label={`Nota ${star}`}
+                      onClick={() => setRating(star)}
+                      className={
+                        "w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-colors " +
+                        (rating && rating >= star
+                          ? "bg-red-500 text-white"
+                          : "bg-red-950/40 text-red-200 hover:bg-red-900")
+                      }
+                    >
+                      {star}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {error && (
+                <div className="text-sm text-red-200 bg-red-950/40 rounded px-3 py-2">{error}</div>
+              )}
+              <Button
+                onClick={handleSubmit}
+                disabled={isDisabled}
+                className="w-full h-12 text-base bg-red-600 hover:bg-red-700 disabled:opacity-50"
+              >
+                {isSubmitting ? "Enviando..." : "Enviar"}
+              </Button>
             </div>
-          </div>
-
-          {error && (
-            <div className="text-sm text-red-200 bg-red-950/40 rounded px-3 py-2">{error}</div>
           )}
-          {success && (
-            <div className="text-sm text-green-200 bg-green-950/20 rounded px-3 py-2">{success}</div>
-          )}
-
-          <Button
-            onClick={handleSubmit}
-            disabled={isDisabled}
-            className="w-full h-12 text-base bg-red-600 hover:bg-red-700 disabled:opacity-50"
-          >
-            {isSubmitting ? "Enviando..." : "Enviar"}
-          </Button>
-        </div>
         </div>
       </main>
       <footer className="pb-6 flex items-center justify-center gap-2 opacity-90">
