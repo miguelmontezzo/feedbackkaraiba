@@ -92,6 +92,31 @@ export default function App() {
 }
 ```
 
+## Página de Feedback (mobile-first)
+
+- Rota: `/id-feedback/:idFeedback/:numeroPedido`
+- Layout: tema vermelho (mobile-first), campo de texto, seleção de nota (1 a 5) e botão enviar.
+- Envio: via webhook configurado na variável `VITE_FEEDBACK_WEBHOOK_URL`.
+
+### Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz com:
+
+```
+VITE_FEEDBACK_WEBHOOK_URL=https://seu-webhook-aqui
+```
+
+O webhook receberá JSON no formato:
+
+```json
+{
+  "feedbackId": "<idFeedback>",
+  "orderNumber": "<numeroPedido>",
+  "rating": 1,
+  "message": "texto do feedback"
+}
+```
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/54a3469a-5082-4b53-82a4-b0a097c9012e) and click on Share -> Publish.
