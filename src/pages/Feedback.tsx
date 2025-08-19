@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabaseFeedback, type LogFeedback, FEEDBACK_SUPABASE_URL, FEEDBACK_SUPABASE_ANON_KEY } from "@/integrations/supabase/feedbackClient";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
 type RouteParams = {
   idFeedback?: string;
@@ -22,6 +22,7 @@ export default function FeedbackPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [loadingSheet, setLoadingSheet] = useState(true);
   const [sheetRecord, setSheetRecord] = useState<LogFeedback | null>(null);
+  const [notFound, setNotFound] = useState(false);
 
   const webhookUrl = useMemo(() => {
     return import.meta.env.VITE_FEEDBACK_WEBHOOK_URL as string | undefined;
@@ -50,7 +51,10 @@ export default function FeedbackPage() {
         }
         const { data, error } = await query.limit(1).maybeSingle();
         if (error) throw error;
-        if (!ignore) setSheetRecord(data || null);
+        if (!ignore) {
+          setSheetRecord(data || null);
+          setNotFound(!data);
+        }
       } catch (e: any) {
         // Fallback direto via REST com headers, para contornar 401 em libs
         try {
@@ -64,7 +68,10 @@ export default function FeedbackPage() {
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
           const rows = await resp.json();
           const found = (rows && rows.length > 0) ? rows[0] : null;
-          if (!ignore) setSheetRecord(found);
+          if (!ignore) {
+            setSheetRecord(found);
+            setNotFound(!found);
+          }
         } catch {
           if (!ignore) setError("Não foi possível carregar dados do feedback.");
         }
@@ -136,15 +143,25 @@ export default function FeedbackPage() {
               className="mx-auto h-32 w-auto mb-3"
               loading="eager"
             />
-            <h1 className="text-3xl font-bold leading-tight">
-              Olá{displayName ? ", " : ""}{displayName ? String(displayName) : "cliente"}!
-            </h1>
-            <p className="text-red-100 text-sm mt-1">
-              Pedido #{numeroPedido || (sheetRecord as any)?.numero_pedido || "-"}
-            </p>
+            {!notFound && (
+              <>
+                <h1 className="text-3xl font-bold leading-tight">
+                  Olá{displayName ? ", " : ""}{displayName ? String(displayName) : "cliente"}!
+                </h1>
+                <p className="text-red-100 text-sm mt-1">
+                  Pedido #{numeroPedido || (sheetRecord as any)?.numero_pedido || "-"}
+                </p>
+              </>
+            )}
           </div>
 
-          {success ? (
+          {notFound ? (
+            <div className="bg-white text-red-900 rounded-lg p-6 text-center shadow-sm">
+              <AlertCircle className="mx-auto h-14 w-14 text-red-600 mb-3" />
+              <h2 className="text-lg font-semibold">Formulário inexistente.</h2>
+              <p className="mt-1 text-sm">Verifique o link recebido.</p>
+            </div>
+          ) : success ? (
             <div className="bg-white text-red-900 rounded-lg p-6 text-center shadow-sm">
               <CheckCircle2 className="mx-auto h-16 w-16 text-green-600 mb-3" />
               <h2 className="text-xl font-semibold">Feedback enviado!</h2>
